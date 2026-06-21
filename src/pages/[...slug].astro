@@ -1,0 +1,25 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { BlockRenderer } from '@/components/blocks';
+import type { Block } from '@/lib/blocks';
+
+export async function getStaticPaths() {
+  const pages = await getCollection('pages');
+  return pages
+    .filter((p) => (p.data.slug ?? p.id) !== 'home')
+    .map((p) => ({ params: { slug: p.data.slug ?? p.id }, props: { entry: p } }));
+}
+
+const { entry } = Astro.props;
+const blocks = (entry.data.blocks ?? []) as unknown as Block[];
+const settings = blocks.find((block) => block.kind === 'siteSettings');
+const themeId = settings?.kind === 'siteSettings' ? settings.themeId : undefined;
+const fontId = settings?.kind === 'siteSettings' ? settings.fontId : undefined;
+const primaryColor = settings?.kind === 'siteSettings' ? settings.primaryColor : undefined;
+const secondaryColor = settings?.kind === 'siteSettings' ? settings.secondaryColor : undefined;
+const backgroundColor = settings?.kind === 'siteSettings' ? settings.backgroundColor : undefined;
+---
+<BaseLayout title={entry.data.title} description={entry.data.description} ogImage={entry.data.ogImage} themeId={themeId} fontId={fontId} primaryColor={primaryColor} secondaryColor={secondaryColor} backgroundColor={backgroundColor}>
+  <BlockRenderer blocks={blocks} client:load />
+</BaseLayout>

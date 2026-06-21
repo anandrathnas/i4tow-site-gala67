@@ -1,0 +1,83 @@
+name: Deploy site to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  # i4tow fires this when galleries/content change in other repos.
+  repository_dispatch:
+    types: [gallery-updated, i4tow-rebuild]
+
+# Built-in GITHUB_TOKEN only — no external secrets.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install
+        run: npm install --no-audit --no-fund
+      - name: Build
+        run: npm run build
+        env:
+          # Set by i4tow at scaffold time (custom apex domain or Pages URL).
+          SITE_URL: ${{ vars.SITE_URL }}
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
+      - name: Notify i4tow that the site is live
+        if: ${{ success() && vars.I4TOW_SITE_ID != '' }}
+        env:
+          I4TOW_SITE_DEPLOY_TOKEN: ${{ secrets.I4TOW_SITE_DEPLOY_TOKEN }}
+        run: |
+          test -n "$I4TOW_SITE_DEPLOY_TOKEN"
+          curl -fsS -X POST https://api.i4tow.date/webhooks/site-deploy \
+            -H "Content-Type: application/json" \
+            -d "{\"siteId\":\"${{ vars.I4TOW_SITE_ID }}\",\"token\":\"$I4TOW_SITE_DEPLOY_TOKEN\"}"
+
+  prune:
+    needs: deploy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prune git history (squash, i4tow)
+        run: |
+          set -euo pipefail
+          # Guard: never force-push an empty tree (a bad checkout must not wipe the repo).
+          test -n "$(git ls-files)"
+          EXPECT="$(git rev-parse HEAD)"
+          git config user.name 'i4tow-bot'
+          git config user.email 'bot@i4tow.date'
+          git checkout --orphan _i4tow_pruned
+          git add -A
+          git commit -q -m 'Prune git history (i4tow)'
+          git branch -M _i4tow_pruned main
+          # Force-push via GITHUB_TOKEN (no workflow re-trigger). Lease aborts
+          # cleanly if origin/main moved since checkout — next sync prunes instead.
+          git push --force-with-lease="main:${EXPECT}" origin main || echo "main moved since checkout; next sync will prune"

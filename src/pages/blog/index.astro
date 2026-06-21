@@ -1,0 +1,36 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import type { Block } from '@/lib/blocks';
+
+const slugOf = (p: { data: { slug?: string }; id: string }) => p.data.slug ?? p.id;
+const posts = (await getCollection('posts')).sort((a, b) => (b.data.date ?? '').localeCompare(a.data.date ?? ''));
+
+// Match the rest of the site's theme/font/colors (taken from the home page).
+const pages = await getCollection('pages');
+const home = pages.find((p) => slugOf(p) === 'home');
+const settings = ((home?.data.blocks ?? []) as unknown as Block[]).find((b) => b.kind === 'siteSettings');
+const themeId = settings?.kind === 'siteSettings' ? settings.themeId : undefined;
+const fontId = settings?.kind === 'siteSettings' ? settings.fontId : undefined;
+const primaryColor = settings?.kind === 'siteSettings' ? settings.primaryColor : undefined;
+const secondaryColor = settings?.kind === 'siteSettings' ? settings.secondaryColor : undefined;
+const backgroundColor = settings?.kind === 'siteSettings' ? settings.backgroundColor : undefined;
+---
+<BaseLayout title="Blog" themeId={themeId} fontId={fontId} primaryColor={primaryColor} secondaryColor={secondaryColor} backgroundColor={backgroundColor}>
+  <section class="mx-auto max-w-4xl px-6 py-20 md:py-28">
+    <h1 class="display-xl text-center text-ink">Blog</h1>
+    {posts.length === 0 && <p class="mt-8 text-center text-ink-soft">No posts yet.</p>}
+    <ul class="mt-12 space-y-10">
+      {posts.map((post) => (
+        <li class="border-b border-line/60 pb-10 last:border-0">
+          <a href={`/blog/${slugOf(post)}/`} class="group block">
+            {post.data.coverImage && <img src={post.data.coverImage} alt="" class="mb-5 aspect-[16/9] w-full rounded-[var(--radius-card)] object-cover shadow-soft" loading="lazy" decoding="async" />}
+            <h2 class="display-lg text-ink transition-colors group-hover:text-clay">{post.data.title}</h2>
+            {post.data.date && <p class="mt-2 text-sm text-ink-soft">{post.data.date}</p>}
+            {(post.data.excerpt ?? post.data.description) && <p class="mt-3 text-lg text-ink-soft">{post.data.excerpt ?? post.data.description}</p>}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+</BaseLayout>

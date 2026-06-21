@@ -1,0 +1,39 @@
+---
+import { getCollection } from 'astro:content';
+import { marked } from 'marked';
+import DOMPurify from 'isomorphic-dompurify';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { BlockRenderer } from '@/components/blocks';
+import type { Block } from '@/lib/blocks';
+
+const BODY_TAGS = ['p', 'br', 'strong', 'em', 'b', 'i', 'u', 's', 'a', 'ul', 'ol', 'li', 'blockquote', 'h2', 'h3', 'h4', 'code', 'pre', 'hr'];
+const ALLOWED_ATTR = ['href', 'title'];
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts');
+  return posts.map((post) => ({ params: { slug: post.data.slug ?? post.id }, props: { entry: post } }));
+}
+
+const { entry } = Astro.props;
+const blocks = (entry.data.blocks ?? []) as unknown as Block[];
+const settings = blocks.find((block) => block.kind === 'siteSettings');
+const themeId = settings?.kind === 'siteSettings' ? settings.themeId : undefined;
+const fontId = settings?.kind === 'siteSettings' ? settings.fontId : undefined;
+const primaryColor = settings?.kind === 'siteSettings' ? settings.primaryColor : undefined;
+const secondaryColor = settings?.kind === 'siteSettings' ? settings.secondaryColor : undefined;
+const backgroundColor = settings?.kind === 'siteSettings' ? settings.backgroundColor : undefined;
+const descriptionHtml = entry.data.description
+  ? DOMPurify.sanitize(marked.parse(entry.data.description, { async: false }) as string, { ALLOWED_TAGS: BODY_TAGS, ALLOWED_ATTR })
+  : '';
+const descriptionAlign = entry.data.descriptionAlign ?? 'center';
+---
+<BaseLayout title={entry.data.title} description={entry.data.description} ogImage={entry.data.coverImage ?? entry.data.ogImage} themeId={themeId} fontId={fontId} primaryColor={primaryColor} secondaryColor={secondaryColor} backgroundColor={backgroundColor}>
+  <article class="mx-auto max-w-4xl px-6 py-20 md:py-28">
+    <h1 class="display-xl mx-auto max-w-3xl text-center text-ink">{entry.data.title}</h1>
+    {descriptionHtml && <div class="rich-body mx-auto mt-6 max-w-2xl text-lg text-ink-soft" style={`text-align: ${descriptionAlign}`} set:html={descriptionHtml} />}
+    {entry.data.coverImage && (
+      <img src={entry.data.coverImage} alt="" class="mt-12 aspect-[16/9] w-full rounded-[var(--radius-card)] object-cover shadow-soft" loading="eager" decoding="async" />
+    )}
+  </article>
+  <BlockRenderer blocks={blocks} client:load />
+</BaseLayout>

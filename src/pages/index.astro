@@ -1,0 +1,28 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { BlockRenderer } from '@/components/blocks';
+import type { Block } from '@/lib/blocks';
+
+const pages = await getCollection('pages');
+const home = pages.find((p) => (p.data.slug ?? p.id) === 'home');
+const blocks = (home?.data.blocks ?? []) as unknown as Block[];
+const settings = blocks.find((block) => block.kind === 'siteSettings');
+const themeId = settings?.kind === 'siteSettings' ? settings.themeId : undefined;
+const fontId = settings?.kind === 'siteSettings' ? settings.fontId : undefined;
+const primaryColor = settings?.kind === 'siteSettings' ? settings.primaryColor : undefined;
+const secondaryColor = settings?.kind === 'siteSettings' ? settings.secondaryColor : undefined;
+const backgroundColor = settings?.kind === 'siteSettings' ? settings.backgroundColor : undefined;
+---
+<BaseLayout
+  title={home?.data.title ?? "Roopali's Kala Art Studio"}
+  description={home?.data.description}
+  ogImage={home?.data.ogImage}
+  themeId={themeId}
+  fontId={fontId}
+  primaryColor={primaryColor}
+  secondaryColor={secondaryColor}
+  backgroundColor={backgroundColor}
+>
+  <BlockRenderer blocks={blocks} client:load />
+</BaseLayout>

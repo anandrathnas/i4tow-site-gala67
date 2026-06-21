@@ -1,0 +1,142 @@
+@import "tailwindcss";
+
+/* ── Warm-artistic design tokens ──────────────────────────────────────────
+   An art-studio palette: warm sand/cream canvas, terracotta + clay, deep
+   warm ink, muted sage + ochre accents. Serif display (Fraunces) over a
+   clean sans (DM Sans). The neutral-but-warm canvas lets colorful student
+   artwork pop, with more personality than a stark white gallery. */
+@theme {
+  --color-canvas: #faf4ec;        /* warm cream background */
+  --color-surface: #f3e9da;       /* raised warm surface */
+  --color-ink: #2a211c;           /* deep warm brown-black text */
+  --color-ink-soft: #5b4f47;      /* secondary text (AA on canvas) */
+  --color-clay: #c5683f;          /* primary terracotta */
+  --color-clay-deep: #a14f2c;     /* hover/active */
+  --color-sage: #6f7a5a;          /* muted green accent */
+  --color-ochre: #d8a44b;         /* warm gold accent */
+  --color-line: #e3d6c4;          /* hairline borders */
+
+  --font-display: "Fraunces", ui-serif, Georgia, serif;
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+
+  --radius-card: 1.25rem;
+  --shadow-soft: 0 1px 2px rgb(42 33 28 / 0.04), 0 12px 32px -12px rgb(42 33 28 / 0.18);
+}
+
+:root { color-scheme: light; }
+
+[data-site-theme="minimalGallery"] {
+  --color-canvas: #f8f8f5;
+  --color-surface: #ffffff;
+  --color-ink: #171717;
+  --color-ink-soft: #55554f;
+  --color-clay: #3f5f6f;
+  --color-clay-deep: #294657;
+  --color-sage: #6f7f69;
+  --color-ochre: #b69b5e;
+  --color-line: #deded7;
+}
+
+[data-site-theme="boldEditorial"] {
+  --color-canvas: #fff3df;
+  --color-surface: #ffe4bc;
+  --color-ink: #241313;
+  --color-ink-soft: #67413a;
+  --color-clay: #bb3d2b;
+  --color-clay-deep: #8f251b;
+  --color-sage: #315f5a;
+  --color-ochre: #e19a23;
+  --color-line: #efb783;
+}
+
+[data-site-font="dmSans"] { --font-display: "DM Sans", ui-sans-serif, system-ui, sans-serif; --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif; }
+[data-site-font="roboto"] { --font-display: "Roboto", ui-sans-serif, system-ui, sans-serif; --font-sans: "Roboto", ui-sans-serif, system-ui, sans-serif; }
+[data-site-font="openSans"] { --font-display: "Open Sans", ui-sans-serif, system-ui, sans-serif; --font-sans: "Open Sans", ui-sans-serif, system-ui, sans-serif; }
+[data-site-font="lato"] { --font-display: "Lato", ui-sans-serif, system-ui, sans-serif; --font-sans: "Lato", ui-sans-serif, system-ui, sans-serif; }
+[data-site-font="montserrat"] { --font-display: "Montserrat", ui-sans-serif, system-ui, sans-serif; --font-sans: "Montserrat", ui-sans-serif, system-ui, sans-serif; }
+[data-site-font="poppins"] { --font-display: "Poppins", ui-sans-serif, system-ui, sans-serif; --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif; }
+[data-site-font="inter"] { --font-display: "Inter", ui-sans-serif, system-ui, sans-serif; --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif; }
+[data-site-font="oswald"] { --font-display: "Oswald", ui-sans-serif, system-ui, sans-serif; --font-sans: "Oswald", ui-sans-serif, system-ui, sans-serif; }
+[data-site-font="raleway"] { --font-display: "Raleway", ui-sans-serif, system-ui, sans-serif; --font-sans: "Raleway", ui-sans-serif, system-ui, sans-serif; }
+[data-site-font="notoSans"] { --font-display: "Noto Sans", ui-sans-serif, system-ui, sans-serif; --font-sans: "Noto Sans", ui-sans-serif, system-ui, sans-serif; }
+[data-site-font="sourceSans3"] { --font-display: "Source Sans 3", ui-sans-serif, system-ui, sans-serif; --font-sans: "Source Sans 3", ui-sans-serif, system-ui, sans-serif; }
+[data-site-font="ubuntu"] { --font-display: "Ubuntu", ui-sans-serif, system-ui, sans-serif; --font-sans: "Ubuntu", ui-sans-serif, system-ui, sans-serif; }
+[data-site-font="nunitoSans"] { --font-display: "Nunito Sans", ui-sans-serif, system-ui, sans-serif; --font-sans: "Nunito Sans", ui-sans-serif, system-ui, sans-serif; }
+[data-site-font="merriweather"] { --font-display: "Merriweather", ui-serif, Georgia, serif; --font-sans: "Merriweather", ui-serif, Georgia, serif; }
+[data-site-font="playfairDisplay"] { --font-display: "Playfair Display", ui-serif, Georgia, serif; --font-sans: "Playfair Display", ui-serif, Georgia, serif; }
+[data-site-font="robotoSlab"] { --font-display: "Roboto Slab", ui-serif, Georgia, serif; --font-sans: "Roboto Slab", ui-serif, Georgia, serif; }
+[data-site-font="rubik"] { --font-display: "Rubik", ui-sans-serif, system-ui, sans-serif; --font-sans: "Rubik", ui-sans-serif, system-ui, sans-serif; }
+[data-site-font="ptSans"] { --font-display: "PT Sans", ui-sans-serif, system-ui, sans-serif; --font-sans: "PT Sans", ui-sans-serif, system-ui, sans-serif; }
+[data-site-font="workSans"] { --font-display: "Work Sans", ui-sans-serif, system-ui, sans-serif; --font-sans: "Work Sans", ui-sans-serif, system-ui, sans-serif; }
+[data-site-font="mulish"] { --font-display: "Mulish", ui-sans-serif, system-ui, sans-serif; --font-sans: "Mulish", ui-sans-serif, system-ui, sans-serif; }
+[data-site-font="robotoCondensed"] { --font-display: "Roboto Condensed", ui-sans-serif, system-ui, sans-serif; --font-sans: "Roboto Condensed", ui-sans-serif, system-ui, sans-serif; }
+[data-site-font="notoSerif"] { --font-display: "Noto Serif", ui-serif, Georgia, serif; --font-sans: "Noto Serif", ui-serif, Georgia, serif; }
+[data-site-font="libreBaskerville"] { --font-display: "Libre Baskerville", ui-serif, Georgia, serif; --font-sans: "Libre Baskerville", ui-serif, Georgia, serif; }
+[data-site-font="cormorantGaramond"] { --font-display: "Cormorant Garamond", ui-serif, Georgia, serif; --font-sans: "Cormorant Garamond", ui-serif, Georgia, serif; }
+[data-site-font="quicksand"] { --font-display: "Quicksand", ui-sans-serif, system-ui, sans-serif; --font-sans: "Quicksand", ui-sans-serif, system-ui, sans-serif; }
+
+html {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body { margin: 0; min-height: 100dvh; background: var(--color-canvas); font-family: var(--font-sans); }
+
+h1, h2, h3, .font-display { font-family: var(--font-display); font-optical-sizing: auto; }
+
+/* Fluid display type */
+.display-xl { font-size: clamp(2.5rem, 6vw, 5rem); line-height: 1.02; letter-spacing: -0.02em; }
+.display-lg { font-size: clamp(2rem, 4.5vw, 3.5rem); line-height: 1.06; letter-spacing: -0.015em; }
+
+/* ── Motion primitives ────────────────────────────────────────────────────
+   Scroll-reveal + loading use these; all gated by prefers-reduced-motion. */
+@keyframes reveal-up {
+  from { opacity: 0; transform: translate3d(0, 18px, 0); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+/* Hidden-before-reveal only when JS is present (html.js, set inline in <head>),
+   so no-JS users and crawlers always see content. */
+.js [data-reveal] { opacity: 0; }
+.js [data-reveal].is-in { animation: reveal-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+
+/* Astro view-transition: smooth fade-out + fade/slide-in of the new page.
+   (vt-fade-in is also reused by the loading splash.) */
+@keyframes vt-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes vt-page-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+::view-transition-old(root) { animation: 0.2s ease both vt-fade-in reverse; }
+::view-transition-new(root) { animation: 0.42s cubic-bezier(0.22, 1, 0.36, 1) both vt-page-in; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] { opacity: 1; animation: none; }
+  ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
+  *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+
+/* ── Rich text body (markdown-rendered block content from the studio) ───────── */
+.rich-body { display: flow-root; }
+.rich-body > * + * { margin-top: 1rem; }
+.rich-body p { margin: 0; }
+.rich-body strong, .rich-body b { font-weight: 700; }
+.rich-body em, .rich-body i { font-style: italic; }
+.rich-body u { text-decoration: underline; text-underline-offset: 2px; }
+.rich-body a { color: var(--color-clay); text-decoration: underline; text-underline-offset: 2px; }
+.rich-body a:hover { color: var(--color-clay-deep); }
+.rich-body ul, .rich-body ol { margin: 0; padding-left: 1.5rem; }
+.rich-body ul { list-style: disc; }
+.rich-body ol { list-style: decimal; }
+.rich-body li { margin-top: 0.35rem; }
+.rich-body li::marker { color: var(--color-clay); }
+.rich-body blockquote { border-left: 3px solid var(--color-line); padding-left: 1rem; font-style: italic; color: var(--color-ink-soft); }
+.rich-body h1, .rich-body h2, .rich-body h3, .rich-body h4, .rich-body h5, .rich-body h6 { font-family: var(--font-display); font-weight: 600; color: var(--color-ink); line-height: 1.2; }
+.rich-body h1 { font-size: 2rem; }
+.rich-body h2 { font-size: 1.6rem; }
+.rich-body h3 { font-size: 1.3rem; }
+.rich-body h4 { font-size: 1.1rem; }
+.rich-body h5 { font-size: 1rem; }
+.rich-body h6 { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; }
+.rich-body code { font-family: ui-monospace, monospace; font-size: 0.9em; background: color-mix(in srgb, var(--color-ink) 8%, transparent); padding: 0.1em 0.35em; border-radius: 4px; }
+.rich-body img { max-width: 100%; height: auto; border-radius: var(--radius-card, 8px); }

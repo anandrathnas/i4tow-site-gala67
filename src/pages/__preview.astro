@@ -1,0 +1,24 @@
+---
+// Live-preview harness route (loaded in an iframe by the i4tow editor).
+// Ships the real compiled Tailwind + the real block components.
+import '@/styles/global.css';
+import { PreviewIsland } from '@/components/PreviewIsland';
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <script is:inline>document.documentElement.classList.add('js');</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;500;700&family=Lato:wght@400;700&family=Montserrat:wght@400;500;700&family=Poppins:wght@400;500;700&family=Inter:wght@400;500;700&family=Oswald:wght@400;500;700&family=Raleway:wght@400;500;700&family=Noto+Sans:wght@400;500;700&family=Source+Sans+3:wght@400;500;700&family=Ubuntu:wght@400;500;700&family=Nunito+Sans:wght@400;500;700&family=Merriweather:wght@400;700&family=Playfair+Display:wght@400;600;700&family=Roboto+Slab:wght@400;600;700&family=Rubik:wght@400;500;700&family=PT+Sans:wght@400;700&family=Work+Sans:wght@400;500;700&family=Mulish:wght@400;500;700&family=Roboto+Condensed:wght@400;700&family=Noto+Serif:wght@400;700&family=Libre+Baskerville:wght@400;700&family=Cormorant+Garamond:wght@400;600;700&family=Quicksand:wght@400;500;700&display=swap" />
+    <title>Preview</title>
+  </head>
+  <body>
+    <main>
+      <PreviewIsland client:only="react" />
+    </main>
+  </body>
+</html>

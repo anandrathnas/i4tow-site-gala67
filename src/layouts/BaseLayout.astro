@@ -1,0 +1,101 @@
+---
+import '@/styles/global.css';
+import { getCollection } from 'astro:content';
+import { ClientRouter } from 'astro:transitions';
+import { LoadingScreen } from '@/components/motion';
+import { Nav, type NavLink } from '@/components/Nav';
+
+interface Props {
+  title: string;
+  description?: string;
+  ogImage?: string;
+  themeId?: string;
+  fontId?: string;
+  primaryColor?: string;
+  secondaryColor?: string;
+  backgroundColor?: string;
+}
+const { title, description, ogImage, themeId = 'warmArtStudio', fontId = 'dmSans', primaryColor, secondaryColor, backgroundColor } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+
+// Nav + brand are derived from the actual published pages, so they reflect
+// what exists (no hardcoded About/Curriculum/Contact that 404).
+const allPages = await getCollection('pages');
+const allPosts = await getCollection('posts');
+const pageSlug = (p: { data: { slug?: string }; id: string }) => p.data.slug ?? p.id;
+const homePage = allPages.find((p) => pageSlug(p) === 'home');
+const siteName = homePage?.data.title?.trim() || 'Home';
+const navLinks: NavLink[] = allPages
+  .filter((p) => pageSlug(p) !== 'home')
+  .map((p) => ({ label: p.data.title, href: `/${pageSlug(p)}/` }))
+  .sort((a, b) => a.label.localeCompare(b.label));
+if (allPosts.length > 0) navLinks.push({ label: 'Blog', href: '/blog/' });
+
+const fullTitle = title === siteName ? title : `${title} – ${siteName}`;
+const normalizeColor = (value: unknown) => typeof value === 'string' && /^#[0-9a-f]{6}$/i.test(value) ? value.toLowerCase() : undefined;
+const hexToRgb = (hex: string) => {
+  const value = hex.replace('#', '');
+  return { r: parseInt(value.slice(0, 2), 16), g: parseInt(value.slice(2, 4), 16), b: parseInt(value.slice(4, 6), 16) };
+};
+const rgbToHex = ({ r, g, b }: { r: number; g: number; b: number }) => `#${[r, g, b].map((value) => Math.max(0, Math.min(255, Math.round(value))).toString(16).padStart(2, '0')).join('')}`;
+const mixColors = (a: string, b: string, amount: number) => {
+  const first = hexToRgb(a);
+  const second = hexToRgb(b);
+  return rgbToHex({
+    r: first.r + (second.r - first.r) * amount,
+    g: first.g + (second.g - first.g) * amount,
+    b: first.b + (second.b - first.b) * amount,
+  });
+};
+const readableInk = (color: string) => {
+  const { r, g, b } = hexToRgb(color);
+  return (r * 0.299 + g * 0.587 + b * 0.114) > 160 ? '#1f1712' : '#fffaf3';
+};
+const primary = normalizeColor(primaryColor);
+const secondary = normalizeColor(secondaryColor);
+const background = normalizeColor(backgroundColor);
+const ink = background ? readableInk(background) : undefined;
+const colorStyle = primary && secondary && background && ink
+  ? `--color-canvas:${background};--color-surface:${mixColors(background, ink === '#1f1712' ? '#ffffff' : '#000000', 0.08)};--color-ink:${ink};--color-ink-soft:${secondary};--color-clay:${primary};--color-clay-deep:${mixColors(primary, ink, 0.24)};--color-line:${mixColors(background, primary, 0.22)};`
+  : undefined;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline>document.documentElement.classList.add('js');</script>
+    <title>{fullTitle}</title>
+    {description && <meta name="description" content={description} />}
+    <link rel="canonical" href={canonical} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    {description && <meta property="og:description" content={description} />}
+    <meta property="og:url" content={canonical} />
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;500;700&family=Lato:wght@400;700&family=Montserrat:wght@400;500;700&family=Poppins:wght@400;500;700&family=Inter:wght@400;500;700&family=Oswald:wght@400;500;700&family=Raleway:wght@400;500;700&family=Noto+Sans:wght@400;500;700&family=Source+Sans+3:wght@400;500;700&family=Ubuntu:wght@400;500;700&family=Nunito+Sans:wght@400;500;700&family=Merriweather:wght@400;700&family=Playfair+Display:wght@400;600;700&family=Roboto+Slab:wght@400;600;700&family=Rubik:wght@400;500;700&family=PT+Sans:wght@400;700&family=Work+Sans:wght@400;500;700&family=Mulish:wght@400;500;700&family=Roboto+Condensed:wght@400;700&family=Noto+Serif:wght@400;700&family=Libre+Baskerville:wght@400;700&family=Cormorant+Garamond:wght@400;600;700&family=Quicksand:wght@400;500;700&display=swap"
+    />
+    <ClientRouter />
+  </head>
+  <body data-site-theme={themeId} data-site-font={fontId} style={colorStyle}>
+    <LoadingScreen client:load transition:persist />
+
+    <Nav brand={siteName} links={navLinks} client:load />
+
+    <main>
+      <slot />
+    </main>
+
+    <footer class="border-t border-line bg-surface/50">
+      <div class="mx-auto max-w-6xl px-6 py-12 text-sm text-ink-soft">
+        <p class="font-display text-base text-ink">{siteName}</p>
+      </div>
+    </footer>
+  </body>
+</html>
